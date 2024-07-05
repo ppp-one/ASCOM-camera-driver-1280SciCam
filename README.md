@@ -1,5 +1,5 @@
 # ASCOM camera driver for the 1280SciCam
-Basic ASCOM camera driver for the near-infrared (SWIR) [1280SciCam](https://www.princetonirtech.com/products/1280scicam) InGaAs camera (Princeton Infrared Technologies (PIRT)) using the BitFlow Axion 1xE frame grabber and SDK. 
+Basic ASCOM camera driver for the near-infrared (SWIR) [1280SciCam](https://www.princetonirtech.com/products/1280scicam) InGaAs camera (Princeton Infrared Technologies (PIRT)) using the [BitFlow Axion 1xE](https://www.bitflow.com/products/camera-link/axion-1xe/) frame grabber and SDK. 
 
 Made for SPIRIT - SPeculoos InfraRed Imager for Transits. 
 
