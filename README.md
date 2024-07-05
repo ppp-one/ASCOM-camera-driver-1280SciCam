@@ -9,7 +9,7 @@ By default, the 1280SciCam produced 1280×1024 14 bit images (in 16 bit files wi
 
 While the camera could be programmed to trigger single exposures on an external signal, this approach was found to increase read noise. This driver thus employed a continuous mode (where frames were produced immediately one after another) with a dynamic frame time set by the driver per exposure time, where the frame time was set to be the exposure time plus a 100 ms buffer. We did not optimise the buffer time duration, as it was negligible compared to our typical exposure times. However, we did observe that shorter buffer times occasionally introduced image banding artefacts, further investigation is needed to fully understand this and its effect on photometric quality.
 
-See below for a screenshot of the camera in action with MaxIm DL on 1m class telescope at SPECULOOS-South, Paranal Observatory, Chile. Also shown, image of the Trapezium in Orion taken with the camera in the zYJ filter, and a transit of TRAPPIST-1b (also in the zYJ filter).
+See below for a screenshot of the camera in action with MaxIm DL on 1m class telescope at [SPECULOOS-South](https://en.wikipedia.org/wiki/SPECULOOS), Paranal Observatory, Chile. Also shown, image of the Trapezium in Orion taken with the camera in the zYJ filter, and a transit of TRAPPIST-1b (also in the zYJ filter).
 
 ![Collection of images](screenshot-image-transit.png)
 
