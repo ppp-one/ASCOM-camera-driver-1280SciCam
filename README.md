@@ -21,7 +21,7 @@ You will need Windows and Visual Studio (with .NET and C++ dependencies) to deve
 - [ASCOM Platform (make sure to install developer dependencies)](https://github.com/ASCOMInitiative/ASCOMPlatform/releases)
 - [Introduction to Developing ASCOM Drivers](<./Introduction to Developing ASCOM Drivers.pdf>)
 - [ASCOM Camera properties](https://ascom-standards.org/Help/Developer/html/Properties_T_ASCOM_DeviceInterface_ICameraV3.htm)
-- [BitFlow .NET 6.40 SDK (you may need to "unblock" downloaded zip via file properties for things to work for development)](www.bitflow.com/downloads/BitFlow.NET_SDK640.zip)
+- [BitFlow .NET 6.40 SDK (you may need to "unblock" downloaded zip via file properties for things to work for development)](https://www.bitflow.com/downloads/BitFlow.NET_SDK640.zip)
 - [BitFlow .NET Documentation](https://www.bitflow.com/BF.NET/html/index.html)
 - [Help with 32/64 bit driver install](https://ascomtalk.groups.io/g/Developer/topic/88285738#msg4745)
 
