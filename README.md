@@ -92,7 +92,7 @@ exptime = 1
 camera.Expose(exptime, 1, 0) # exposure time, exposure time, filter (if filter wheel set to 0 position)
 
 # Wait for image to be ready
-while not ccd.ImageReady:
+while not camera.ImageReady:
     time.sleep(0.1)
 
 # Save image
