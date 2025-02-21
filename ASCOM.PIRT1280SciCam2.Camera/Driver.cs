@@ -73,6 +73,7 @@ namespace ASCOM.PIRT1280SciCam2
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
         private static string driverDescription = "PIRT1280SciCam2";
+        private static double exposureMinVal = 100e-6;
 
         internal static string comPortProfileName = "CameraLink"; // Constants used for Profile persistence
         internal static string comPortDefault = "0";
@@ -574,7 +575,7 @@ namespace ASCOM.PIRT1280SciCam2
             {
                 tl.LogMessage("ExposureMin Get", "");
                 //throw new ASCOM.PropertyNotImplementedException("ExposureMin", false);
-                return 100e-6;
+                return exposureMinVal;
             }
         }
 
@@ -974,6 +975,11 @@ namespace ASCOM.PIRT1280SciCam2
             tl.LogMessage("StartExposure", "begin");
             exposureRequestedStart = DateTime.Now;
             cameraImageReady = false;
+
+            if (Duration == 0)
+            {
+                Duration = exposureMinVal;
+            }
 
             if (cameraLastExposureDuration != Duration)
             {
@@ -1491,11 +1497,14 @@ namespace ASCOM.PIRT1280SciCam2
 
         private void SetExposure(double exposureTime)
         {
+            tl.LogMessage("SetExposure", exposureTime.ToString());
             double clockFreq = 15e6;
             long exposureCycles = (long)(clockFreq * exposureTime);
 
             double frameTime = 100e-3; // 100ms added to the exposure time
             long frameCycles = exposureCycles + (long)(clockFreq * frameTime);
+
+
 
             SerialWrite("SENS:FRAMEPER " + frameCycles.ToString());
             SerialWrite("SENS:EXPPER " + exposureCycles.ToString());
