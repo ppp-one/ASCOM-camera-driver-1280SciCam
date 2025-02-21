@@ -716,13 +716,13 @@ namespace ASCOM.PIRT1280SciCam2
                 tl.LogMessage("ImageReady Get", cameraImageReady.ToString());
 
                 // REMOVE FIRST IF NOT USING ACP
-                if (cameraImageReady && (DateTime.Now - exposureRequestedStart).TotalSeconds < 1.5)
-                {
-                    tl.LogMessage("ImageReady Get", "Less than 1s");
+                // if (cameraImageReady && (DateTime.Now - exposureRequestedStart).TotalSeconds < 1.5)
+                // {
+                //     tl.LogMessage("ImageReady Get", "Less than 1s");
 
-                    return false;
-                } 
-                else if (cameraImageReady && waiting)
+                //     return false;
+                // } 
+                if (cameraImageReady && waiting)
                 {
                     tl.LogMessage("ImageReady Get", "Camera waiting ffs");
                     return false;
