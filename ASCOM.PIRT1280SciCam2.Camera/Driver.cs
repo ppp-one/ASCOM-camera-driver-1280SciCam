@@ -77,7 +77,7 @@ namespace ASCOM.PIRT1280SciCam2
         internal static string comPortProfileName = "CameraLink"; // Constants used for Profile persistence
         internal static string comPortDefault = "0";
         internal static string traceStateProfileName = "Trace Level";
-        internal static string traceStateDefault = "false";
+        internal static string traceStateDefault = "true";
 
         internal static string comPort; // Variables to hold the current device configuration
 
@@ -427,7 +427,7 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                //tl.LogMessage("CCDTemperature Get", "1");
+                tl.LogMessage("CCDTemperature Get", "1");
                 //throw new ASCOM.PropertyNotImplementedException("CCDTemperature", false);
 
                 return Convert.ToDouble(SerialWrite("TEMP:SENS?", true));
@@ -530,7 +530,7 @@ namespace ASCOM.PIRT1280SciCam2
             {
                 tl.LogMessage("CoolerOn Get", "");
                 //throw new ASCOM.PropertyNotImplementedException("CoolerOn", false);
-                return Convert.ToBoolean(SerialWrite("TEMP:EN?", true));
+                return Convert.ToBoolean(double.Parse(SerialWrite("TEC:EN?", true)));
                 //return true;
             }
             set
@@ -930,8 +930,9 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                tl.LogMessage("SensorName Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("SensorName", false);
+                tl.LogMessage("SensorName Get", "");
+                //throw new ASCOM.PropertyNotImplementedException("SensorName", false);
+                return SerialWrite("SYS:SN?");
             }
         }
 
@@ -939,8 +940,9 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                tl.LogMessage("SensorType Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("SensorType", false);
+                tl.LogMessage("SensorType Get", "");
+                //throw new ASCOM.PropertyNotImplementedException("SensorType", false);
+                return 0;
             }
         }
 
@@ -1197,7 +1199,7 @@ namespace ASCOM.PIRT1280SciCam2
                         //Console.WriteLine("Acq");
                         if ((ReturnValue = CirAcq.WaitForFrameDone(exposurePeriod, ref BufInfo)) == WaitFrameDoneReturns.FrameAcquired)
                         {
-                            tl.LogMessage("Last_duration", cameraLastExposureDuration.ToString());
+                            //tl.LogMessage("Last_duration", cameraLastExposureDuration.ToString());
                             if (waiting)
                             {
                                 newDurationCount += 1;
@@ -1218,7 +1220,7 @@ namespace ASCOM.PIRT1280SciCam2
 
                                 imageBuffer = CirAcq.GetBufferData(BufInfo.m_BufferNumber);
 
-                                tl.LogMessage("Image Acq time", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
+                                //tl.LogMessage("Image Acq time", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
                                 //tl.LogMessage("bufnum", BufInfo.m_BufferNumber.ToString());
 
                                 exposureStart = DateTime.Now.AddSeconds(-1 * cameraLastExposureDuration - 100e-3);
@@ -1437,17 +1439,20 @@ namespace ASCOM.PIRT1280SciCam2
             bool isNumeric = false;
             // Write the text, and append it to the list.
             string writeText = Encoding.ASCII.GetString(Encoding.ASCII.GetBytes(enteredText + "\r"));
+            tl.LogMessage("SerialWrite", writeText);
             try
             {
                 do
                 {
+                    tl.LogMessage("SerialWrite", "in do");
                     m_clserial.SerialWrite(writeText, 1000);
 
                     SpinWait.SpinUntil(() =>
                     {
-                        if (serialResponse != "")
+                        if (serialResponse != "" || serialResponse.EndsWith("K\r"))
                         {
                             r = serialResponse;
+                            tl.LogMessage("SerialResponse", r);
                             //Console.WriteLine(r);
                             return true;
                         }
@@ -1456,6 +1461,8 @@ namespace ASCOM.PIRT1280SciCam2
                             return false;
                         }
                     }, TimeSpan.FromSeconds(1));
+
+                    r = r.Trim();
 
                     if (r == "ON")
                     {
@@ -1467,6 +1474,8 @@ namespace ASCOM.PIRT1280SciCam2
                     }
 
                     isNumeric = double.TryParse(r, out _);
+                    tl.LogMessage("r", r);
+                    tl.LogMessage("isNumeric", isNumeric.ToString());
 
 
                 } while (!isNumeric && numeric);
@@ -1476,7 +1485,6 @@ namespace ASCOM.PIRT1280SciCam2
             {
                 Console.WriteLine(err.Message, "CLSerial Write Error");
             }
-
 
             return r;
         }

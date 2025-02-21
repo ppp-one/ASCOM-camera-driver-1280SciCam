@@ -42,7 +42,8 @@ namespace ASCOM
 
             // TODO add more code to test the driver.
             device.Connected = true;
-            device.StartExposure(1, true);
+            Console.WriteLine("coolerOn " + device.CoolerOn);
+            //device.StartExposure(1, true);
 
             for (int i = 0; i < 100; i++)
             {
@@ -51,10 +52,10 @@ namespace ASCOM
                 Console.WriteLine();
                 Thread.Sleep(100);
 
-                if (device.ImageReady)
-                {
-                    Console.WriteLine(device.ImageArray.GetType());
-                }
+                //if (device.ImageReady)
+                //{
+                //    Console.WriteLine(device.ImageArray.GetType());
+                //}
             }
 
             Console.WriteLine("Press Enter to finish");
