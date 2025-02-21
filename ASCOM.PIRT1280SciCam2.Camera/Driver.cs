@@ -374,8 +374,9 @@ namespace ASCOM.PIRT1280SciCam2
 
         public void AbortExposure()
         {
-            tl.LogMessage("AbortExposure", "Not implemented");
-            throw new MethodNotImplementedException("AbortExposure");
+            //tl.LogMessage("AbortExposure", "Not implemented");
+            //throw new MethodNotImplementedException("AbortExposure");
+            SetExposure(0.3141); // set random short exposure to allow next exposure to be set faster since no abort function present
         }
 
         public short BayerOffsetX
