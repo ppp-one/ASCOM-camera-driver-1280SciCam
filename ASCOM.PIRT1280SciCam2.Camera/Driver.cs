@@ -346,7 +346,7 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                string name = "Short driver name - please customise";
+                string name = "PIRT1280SciCam2";
                 tl.LogMessage("Name Get", name);
                 return name;
             }
@@ -533,7 +533,6 @@ namespace ASCOM.PIRT1280SciCam2
                 tl.LogMessage("CoolerOn Get", "");
                 //throw new ASCOM.PropertyNotImplementedException("CoolerOn", false);
                 return Convert.ToBoolean(double.Parse(SerialWrite("TEC:EN?", true)));
-                //return true;
             }
             set
             {
