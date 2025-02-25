@@ -273,6 +273,7 @@ namespace ASCOM.PIRT1280SciCam2
                         SerialWrite("CORR:OFFSET OFF");
                         SerialWrite("CORR:GAIN OFF");
                         SerialWrite("CORR:SUB OFF");
+                        SerialWrite("DATA:FORMAT 14BIT_BASE");
 
                     }
                     catch (System.Exception Ex)
@@ -377,6 +378,10 @@ namespace ASCOM.PIRT1280SciCam2
             tl.LogMessage("AbortExposure", "");
             //throw new MethodNotImplementedException("AbortExposure");
             SetExposure(0.3141); // set random short exposure to allow next exposure to be set faster since no abort function present
+            waiting = true;
+            cameraState = CameraStates.cameraWaiting;
+            newDurationCount = 0;
+            cameraLastExposureDuration = 0.3141;
         }
 
         public short BayerOffsetX
