@@ -40,12 +40,12 @@ namespace ASCOM
             Console.WriteLine("DriverInfo " + device.DriverInfo);
             Console.WriteLine("driverVersion " + device.DriverVersion);
 
-            // TODO add more code to test the driver.
+            //// TODO add more code to test the driver.
             device.Connected = true;
-            Console.WriteLine("coolerOn " + device.CoolerOn);
+            //Console.WriteLine("coolerOn " + device.CoolerOn);
             //device.StartExposure(1, true);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 10; i++)
             {
                 Console.WriteLine(DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff tt"));
                 Console.WriteLine(device.CCDTemperature);

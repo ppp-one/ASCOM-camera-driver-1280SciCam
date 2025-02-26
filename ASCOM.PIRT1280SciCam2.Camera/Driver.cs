@@ -315,8 +315,8 @@ namespace ASCOM.PIRT1280SciCam2
             get
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                // TODO customise this driver description
-                string driverInfo = "Information about the driver itself. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
+                string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}", version.ToString());
+                string driverInfo = "ASCOM driver for the 1280SciCam, driver v" + driverVersion;
                 tl.LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -327,7 +327,7 @@ namespace ASCOM.PIRT1280SciCam2
             get
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
+                string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}", version.ToString());
                 tl.LogMessage("DriverVersion Get", driverVersion);
                 return driverVersion;
             }
@@ -1409,21 +1409,19 @@ namespace ASCOM.PIRT1280SciCam2
                     LatestRx = LatestRx.Replace("\r\n", "\r").Replace("\n", "").Replace("\0", "").Replace(">", "");
 
                     Rx = string.Concat(Rx, LatestRx);
+                    Console.WriteLine("SerialReadThreadLatestRx " + LatestRx.Replace("\r", "|"));
+                    Console.WriteLine("SerialReadThreadRx " + Rx.Replace("\r", "|"));
 
-                    if (LatestRx.Contains("\r"))
+                    if (Rx.Contains("OK\r"))
                     {
-                        //Console.WriteLine(Rx);
-                        if (Rx != "OK\r")
-                        {
-                            serialResponse = Rx;
-                        }
+                        serialResponse = Rx.Replace("OK\r", "").Replace("\r", "");
                         Rx = "";
                     }
                 }
             }
             catch (System.Exception err)
             {
-                Console.WriteLine("Caught an exception: " + err.Message + "\n\nAborting the read thread. Data can still be written, but no data will be received.", "Data Read Thread Error");
+                tl.LogMessage("SerialReadThreadErr", err.Message);
             }
 
             return;
@@ -1457,14 +1455,15 @@ namespace ASCOM.PIRT1280SciCam2
                 {
                     tl.LogMessage("SerialWrite", "in do");
                     m_clserial.SerialWrite(writeText, 1000);
+                    Console.WriteLine("Sending: " + writeText);
 
                     SpinWait.SpinUntil(() =>
                     {
-                        if (serialResponse != "" || serialResponse.EndsWith("K\r"))
+                        if (serialResponse != "")
                         {
                             r = serialResponse;
                             tl.LogMessage("SerialResponse", r);
-                            //Console.WriteLine(r);
+                            Console.WriteLine("SerialResponse: " + r);
                             return true;
                         }
                         else
