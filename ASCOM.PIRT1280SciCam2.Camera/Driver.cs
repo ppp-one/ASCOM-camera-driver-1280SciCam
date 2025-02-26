@@ -217,7 +217,8 @@ namespace ASCOM.PIRT1280SciCam2
             // TODO The optional CommandString method should either be implemented OR throw a MethodNotImplementedException
             // If implemented, CommandString must send the supplied command to the mount and wait for a response before returning this to the client
 
-            throw new ASCOM.MethodNotImplementedException("CommandString");
+            //throw new ASCOM.MethodNotImplementedException("CommandString");
+            return SerialWrite(command);
         }
 
         public void Dispose()

@@ -45,6 +45,8 @@ namespace ASCOM
             //Console.WriteLine("coolerOn " + device.CoolerOn);
             //device.StartExposure(1, true);
 
+            Console.WriteLine(device.CommandString("TEC:V?", true));
+
             for (int i = 0; i < 10; i++)
             {
                 Console.WriteLine(DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff tt"));
