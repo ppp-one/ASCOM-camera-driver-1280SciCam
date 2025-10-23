@@ -78,7 +78,7 @@ namespace ASCOM.PIRT1280SciCam2
         internal static string comPortProfileName = "CameraLink"; // Constants used for Profile persistence
         internal static string comPortDefault = "0";
         internal static string traceStateProfileName = "Trace Level";
-        internal static string traceStateDefault = "true";
+        internal static string traceStateDefault = "false";
 
         internal static string comPort; // Variables to hold the current device configuration
 
@@ -773,7 +773,7 @@ namespace ASCOM.PIRT1280SciCam2
                     tl.LogMessage("LastExposureStartTime Get", "Throwing InvalidOperationException because of a call to LastExposureStartTime before the first image has been taken!");
                     throw new ASCOM.InvalidOperationException("Call to LastExposureStartTime before the first image has been taken!");
                 }
-                string exposureStartString = exposureStart.ToString("yyyy-MM-ddTHH:mm:ss");
+                string exposureStartString = exposureStart.ToString("yyyy-MM-ddTHH:mm:ss.fff");
                 tl.LogMessage("LastExposureStartTime Get", exposureStartString.ToString());
                 return exposureStartString;
             }
