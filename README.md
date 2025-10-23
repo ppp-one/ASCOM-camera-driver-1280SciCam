@@ -3,7 +3,7 @@ Basic ASCOM camera driver for the near-infrared (SWIR) [1280SciCam](https://www.
 
 Made for SPIRIT - SPeculoos InfraRed Imager for Transits. 
 
-Please refer to my [PhD thesis](https://doi.org/10.17863/CAM.96904) and the SPIE proceedings where I used this camera for further details, specifically see Sect. 6.1.3 in my thesis for a description of how camera driver was designed our its function and use with 32 bit [MaxIm DL](https://diffractionlimited.com/product/maxim-dl/) and [ACP](http://acp.dc3.com/index2.html).
+Please refer to my [PhD thesis](https://doi.org/10.17863/CAM.96904) and the [SPIE proceedings](https://arxiv.org/pdf/2410.22140) where I used this camera for further details, specifically see Sect. 6.1.3 in my thesis for a description of how camera driver was designed our its function and use with 32 bit [MaxIm DL](https://diffractionlimited.com/product/maxim-dl/) and [ACP](http://acp.dc3.com/index2.html).
 
 By default, the 1280SciCam produced 1280×1024 14 bit images (in 16 bit files with this driver) at a frequency of 1/(frame time). The frame time was user-settable and defined as the time from the start of an exposure to frame read.
 
@@ -27,13 +27,35 @@ You will need Windows and Visual Studio (with .NET and C++ dependencies) to deve
 
 The majority code of interest is in [Driver.cs](ASCOM.PIRT1280SciCam2.Camera/Driver.cs). 
 
-_Please note, if you're not using ACP, you may want to get rid of the portion of code that deals with the slowness of ACP (if not included, ACP would hang):_
+## Steps for development
+
+- Install the following (versions used here):
+    - BitFlow SDK (6.40)
+    - ASCOM Platform (6.5)
+    - Visual Studio Community (2022) with .NET and C++ dependencies
+- Install Bitflow framegrabber (Axion 1xE)
+- Open SysReg and register the BFML relevant for the camera
+    - Camera was connected via one cable on base
+- Check if you can see images on Bitflow Preview
+    - You may need to set the camera with to 14BIT_BASE using `DATA:FORMAT 14BIT_BASE` if anything looks weird
+- Open `ASCOM.PIRT1280SciCam2.Camera.sln` in Visual Studio
+    - It may ask you to update the project to the latest versions of .NET
+- Set PIRT1280SciCam2Console as the startup project
+- Add any missing references to the BitFlow SDK DLLs
+    - Right click on References in the Solution Explorer
+    - Click Add Reference
+    - Browse to the BitFlow SDK DLLs (in this repo)
+- Build the solution using x86 platform
+    - You should now see the camera in the ASCOM chooser
+- Run the PIRT1280SciCam2Console project for testing
+
+<!-- _Please note, if you're not using ACP, you may want to get rid of the portion of code that deals with the slowness of ACP (if not included, ACP would hang):_
 
 ```c#
 // REMOVE FIRST IF NOT USING ACP
 if (cameraImageReady && (DateTime.Now - exposureRequestedStart).TotalSeconds < 1.5)
 ...
-```
+``` -->
             
 
 ## Installation

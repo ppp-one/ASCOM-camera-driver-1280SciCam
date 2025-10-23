@@ -73,6 +73,7 @@ namespace ASCOM.PIRT1280SciCam2
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
         private static string driverDescription = "PIRT1280SciCam2";
+        private static double exposureMinVal = 100e-6;
 
         internal static string comPortProfileName = "CameraLink"; // Constants used for Profile persistence
         internal static string comPortDefault = "0";
@@ -216,7 +217,8 @@ namespace ASCOM.PIRT1280SciCam2
             // TODO The optional CommandString method should either be implemented OR throw a MethodNotImplementedException
             // If implemented, CommandString must send the supplied command to the mount and wait for a response before returning this to the client
 
-            throw new ASCOM.MethodNotImplementedException("CommandString");
+            //throw new ASCOM.MethodNotImplementedException("CommandString");
+            return SerialWrite(command);
         }
 
         public void Dispose()
@@ -272,6 +274,7 @@ namespace ASCOM.PIRT1280SciCam2
                         SerialWrite("CORR:OFFSET OFF");
                         SerialWrite("CORR:GAIN OFF");
                         SerialWrite("CORR:SUB OFF");
+                        SerialWrite("DATA:FORMAT 14BIT_BASE");
 
                     }
                     catch (System.Exception Ex)
@@ -313,8 +316,8 @@ namespace ASCOM.PIRT1280SciCam2
             get
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                // TODO customise this driver description
-                string driverInfo = "Information about the driver itself. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
+                string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}", version.ToString());
+                string driverInfo = "ASCOM driver for the 1280SciCam, driver v" + driverVersion;
                 tl.LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -325,7 +328,7 @@ namespace ASCOM.PIRT1280SciCam2
             get
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
+                string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}", version.ToString());
                 tl.LogMessage("DriverVersion Get", driverVersion);
                 return driverVersion;
             }
@@ -345,7 +348,7 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                string name = "Short driver name - please customise";
+                string name = "PIRT1280SciCam2";
                 tl.LogMessage("Name Get", name);
                 return name;
             }
@@ -373,8 +376,13 @@ namespace ASCOM.PIRT1280SciCam2
 
         public void AbortExposure()
         {
-            tl.LogMessage("AbortExposure", "Not implemented");
-            throw new MethodNotImplementedException("AbortExposure");
+            tl.LogMessage("AbortExposure", "");
+            //throw new MethodNotImplementedException("AbortExposure");
+            SetExposure(0.3141); // set random short exposure to allow next exposure to be set faster since no abort function present
+            waiting = true;
+            cameraState = CameraStates.cameraWaiting;
+            newDurationCount = 0;
+            cameraLastExposureDuration = 0.3141;
         }
 
         public short BayerOffsetX
@@ -427,7 +435,7 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                //tl.LogMessage("CCDTemperature Get", "1");
+                tl.LogMessage("CCDTemperature Get", "1");
                 //throw new ASCOM.PropertyNotImplementedException("CCDTemperature", false);
 
                 return Convert.ToDouble(SerialWrite("TEMP:SENS?", true));
@@ -530,8 +538,7 @@ namespace ASCOM.PIRT1280SciCam2
             {
                 tl.LogMessage("CoolerOn Get", "");
                 //throw new ASCOM.PropertyNotImplementedException("CoolerOn", false);
-                return Convert.ToBoolean(SerialWrite("TEMP:EN?", true));
-                //return true;
+                return Convert.ToBoolean(double.Parse(SerialWrite("TEC:EN?", true)));
             }
             set
             {
@@ -574,7 +581,7 @@ namespace ASCOM.PIRT1280SciCam2
             {
                 tl.LogMessage("ExposureMin Get", "");
                 //throw new ASCOM.PropertyNotImplementedException("ExposureMin", false);
-                return 100e-6;
+                return exposureMinVal;
             }
         }
 
@@ -716,13 +723,13 @@ namespace ASCOM.PIRT1280SciCam2
                 tl.LogMessage("ImageReady Get", cameraImageReady.ToString());
 
                 // REMOVE FIRST IF NOT USING ACP
-                if (cameraImageReady && (DateTime.Now - exposureRequestedStart).TotalSeconds < 1.5)
-                {
-                    tl.LogMessage("ImageReady Get", "Less than 1s");
+                // if (cameraImageReady && (DateTime.Now - exposureRequestedStart).TotalSeconds < 1.5)
+                // {
+                //     tl.LogMessage("ImageReady Get", "Less than 1s");
 
-                    return false;
-                } 
-                else if (cameraImageReady && waiting)
+                //     return false;
+                // } 
+                if (cameraImageReady && waiting)
                 {
                     tl.LogMessage("ImageReady Get", "Camera waiting ffs");
                     return false;
@@ -766,7 +773,7 @@ namespace ASCOM.PIRT1280SciCam2
                     tl.LogMessage("LastExposureStartTime Get", "Throwing InvalidOperationException because of a call to LastExposureStartTime before the first image has been taken!");
                     throw new ASCOM.InvalidOperationException("Call to LastExposureStartTime before the first image has been taken!");
                 }
-                string exposureStartString = exposureStart.ToString("yyyy-MM-ddTHH:mm:ss");
+                string exposureStartString = exposureStart.ToString("yyyy-MM-ddTHH:mm:ss.fff");
                 tl.LogMessage("LastExposureStartTime Get", exposureStartString.ToString());
                 return exposureStartString;
             }
@@ -930,8 +937,9 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                tl.LogMessage("SensorName Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("SensorName", false);
+                tl.LogMessage("SensorName Get", "");
+                //throw new ASCOM.PropertyNotImplementedException("SensorName", false);
+                return SerialWrite("SYS:SN?");
             }
         }
 
@@ -939,8 +947,9 @@ namespace ASCOM.PIRT1280SciCam2
         {
             get
             {
-                tl.LogMessage("SensorType Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("SensorType", false);
+                tl.LogMessage("SensorType Get", "");
+                //throw new ASCOM.PropertyNotImplementedException("SensorType", false);
+                return 0;
             }
         }
 
@@ -972,6 +981,11 @@ namespace ASCOM.PIRT1280SciCam2
             tl.LogMessage("StartExposure", "begin");
             exposureRequestedStart = DateTime.Now;
             cameraImageReady = false;
+
+            if (Duration == 0)
+            {
+                Duration = exposureMinVal;
+            }
 
             if (cameraLastExposureDuration != Duration)
             {
@@ -1197,7 +1211,7 @@ namespace ASCOM.PIRT1280SciCam2
                         //Console.WriteLine("Acq");
                         if ((ReturnValue = CirAcq.WaitForFrameDone(exposurePeriod, ref BufInfo)) == WaitFrameDoneReturns.FrameAcquired)
                         {
-                            tl.LogMessage("Last_duration", cameraLastExposureDuration.ToString());
+                            //tl.LogMessage("Last_duration", cameraLastExposureDuration.ToString());
                             if (waiting)
                             {
                                 newDurationCount += 1;
@@ -1218,7 +1232,7 @@ namespace ASCOM.PIRT1280SciCam2
 
                                 imageBuffer = CirAcq.GetBufferData(BufInfo.m_BufferNumber);
 
-                                tl.LogMessage("Image Acq time", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
+                                //tl.LogMessage("Image Acq time", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
                                 //tl.LogMessage("bufnum", BufInfo.m_BufferNumber.ToString());
 
                                 exposureStart = DateTime.Now.AddSeconds(-1 * cameraLastExposureDuration - 100e-3);
@@ -1396,21 +1410,19 @@ namespace ASCOM.PIRT1280SciCam2
                     LatestRx = LatestRx.Replace("\r\n", "\r").Replace("\n", "").Replace("\0", "").Replace(">", "");
 
                     Rx = string.Concat(Rx, LatestRx);
+                    Console.WriteLine("SerialReadThreadLatestRx " + LatestRx.Replace("\r", "|"));
+                    Console.WriteLine("SerialReadThreadRx " + Rx.Replace("\r", "|"));
 
-                    if (LatestRx.Contains("\r"))
+                    if (Rx.Contains("OK\r"))
                     {
-                        //Console.WriteLine(Rx);
-                        if (Rx != "OK\r")
-                        {
-                            serialResponse = Rx;
-                        }
+                        serialResponse = Rx.Replace("OK\r", "").Replace("\r", "");
                         Rx = "";
                     }
                 }
             }
             catch (System.Exception err)
             {
-                Console.WriteLine("Caught an exception: " + err.Message + "\n\nAborting the read thread. Data can still be written, but no data will be received.", "Data Read Thread Error");
+                tl.LogMessage("SerialReadThreadErr", err.Message);
             }
 
             return;
@@ -1437,18 +1449,22 @@ namespace ASCOM.PIRT1280SciCam2
             bool isNumeric = false;
             // Write the text, and append it to the list.
             string writeText = Encoding.ASCII.GetString(Encoding.ASCII.GetBytes(enteredText + "\r"));
+            tl.LogMessage("SerialWrite", writeText);
             try
             {
                 do
                 {
+                    tl.LogMessage("SerialWrite", "in do");
                     m_clserial.SerialWrite(writeText, 1000);
+                    Console.WriteLine("Sending: " + writeText);
 
                     SpinWait.SpinUntil(() =>
                     {
                         if (serialResponse != "")
                         {
                             r = serialResponse;
-                            //Console.WriteLine(r);
+                            tl.LogMessage("SerialResponse", r);
+                            Console.WriteLine("SerialResponse: " + r);
                             return true;
                         }
                         else
@@ -1456,6 +1472,8 @@ namespace ASCOM.PIRT1280SciCam2
                             return false;
                         }
                     }, TimeSpan.FromSeconds(1));
+
+                    r = r.Trim();
 
                     if (r == "ON")
                     {
@@ -1467,6 +1485,8 @@ namespace ASCOM.PIRT1280SciCam2
                     }
 
                     isNumeric = double.TryParse(r, out _);
+                    tl.LogMessage("r", r);
+                    tl.LogMessage("isNumeric", isNumeric.ToString());
 
 
                 } while (!isNumeric && numeric);
@@ -1477,17 +1497,19 @@ namespace ASCOM.PIRT1280SciCam2
                 Console.WriteLine(err.Message, "CLSerial Write Error");
             }
 
-
             return r;
         }
 
         private void SetExposure(double exposureTime)
         {
+            tl.LogMessage("SetExposure", exposureTime.ToString());
             double clockFreq = 15e6;
             long exposureCycles = (long)(clockFreq * exposureTime);
 
             double frameTime = 100e-3; // 100ms added to the exposure time
             long frameCycles = exposureCycles + (long)(clockFreq * frameTime);
+
+
 
             SerialWrite("SENS:FRAMEPER " + frameCycles.ToString());
             SerialWrite("SENS:EXPPER " + exposureCycles.ToString());
